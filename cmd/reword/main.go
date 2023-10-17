@@ -6,14 +6,12 @@ import (
 	"os"
 	"strings"
 
-	"github.com/ejoffe/spr/config"
-	"github.com/ejoffe/spr/git/realgit"
 	"github.com/google/uuid"
 )
 
 func main() {
 	filename := os.Args[1]
-	gitcmd := realgit.NewGitCmd(config.DefaultConfig())
+
 	if !strings.HasSuffix(filename, "COMMIT_EDITMSG") {
 		readfile, err := os.Open(filename)
 		check(err)
@@ -31,14 +29,7 @@ func main() {
 		check(err)
 
 		for _, line := range lines {
-			if strings.HasPrefix(line, "pick") {
-				res := strings.Split(line, " ")
-				var out string
-				gitcmd.Git("log --format=%B -n 1 "+res[1], &out)
-				if !strings.Contains(out, "commit-id") {
-					line = strings.Replace(line, "pick ", "reword ", 1)
-				}
-			}
+			line := strings.Replace(line, "pick ", "reword ", 1)
 			writefile.WriteString(line + "\n")
 		}
 		writefile.Close()
